@@ -18,14 +18,6 @@
       "command": "npm test -- ${file} --run",
       "request": "launch",
       "type": "node-terminal"
-    },
-    {
-      "name": "Launch via npm",
-      "type": "node",
-      "request": "launch",
-      "cwd": "${workspaceFolder}",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run-script", "test", "-- ${file} --run"]
     }
   ]
 }
