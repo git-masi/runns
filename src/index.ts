@@ -3,7 +3,7 @@ import inquirer from "inquirer";
 import { getChoicesFromDir } from "./file-system.js";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
-const choices = getChoicesFromDir(__dirname);
+const choices = await getChoicesFromDir(__dirname);
 
 const selectedScripts = await inquirer.prompt([
   {
