@@ -1,7 +1,14 @@
-export function run<
+import { existsSync } from "fs";
+import { mkdir } from "fs/promises";
+
+export async function run<
   T extends {
     rootDir: string;
   }
 >(params: T) {
-  // write bugs here
+  const dotvscodePath = new URL("./.vscode/", params.rootDir);
+
+  if (!existsSync(dotvscodePath)) {
+    await mkdir(dotvscodePath);
+  }
 }
