@@ -13,7 +13,7 @@ const selectedScripts = await inquirer.prompt([
     choices: choices,
     validate(answer) {
       if (answer.length < 1) {
-        return "You must choose at least one topping.";
+        return "You must choose at least script.";
       }
 
       return true;
