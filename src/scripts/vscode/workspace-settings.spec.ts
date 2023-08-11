@@ -1,7 +1,7 @@
 import { describe, test, expect, afterEach } from "vitest";
 import { run } from "./workspace-settings.js";
 import { existsSync } from "fs";
-import { rm } from "fs/promises";
+import { readFile, rm } from "fs/promises";
 
 describe("workspace-settings", () => {
   const parentDir = new URL(".", import.meta.url);
@@ -22,5 +22,19 @@ describe("workspace-settings", () => {
   test("it should create a new settings.json file if not exists", async () => {
     await run({ rootDir: parentDir.toString() });
     expect(existsSync(settingsPath)).toBe(true);
+  });
+
+  test("a new settings.json file should have the default values", async () => {
+    await run({ rootDir: parentDir.toString() });
+
+    const createdSettings = await readFile(settingsPath, { encoding: "utf-8" });
+    const defaultSettings = await readFile(
+      new URL("./settings.json", parentDir),
+      { encoding: "utf-8" }
+    );
+
+    expect(JSON.parse(createdSettings)).toMatchObject(
+      JSON.parse(defaultSettings)
+    );
   });
 });
