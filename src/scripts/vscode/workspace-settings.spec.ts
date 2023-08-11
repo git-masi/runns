@@ -1,12 +1,16 @@
 import { describe, test, expect, afterEach } from "vitest";
 import { run } from "./workspace-settings.js";
 import { existsSync } from "fs";
-import { readFile, rm } from "fs/promises";
+import { mkdir, readFile, rm, writeFile } from "fs/promises";
 
-describe("workspace-settings", () => {
+describe("workspace-settings", async () => {
   const parentDir = new URL(".", import.meta.url);
   const testPath = new URL("./.vscode/", parentDir);
   const settingsPath = new URL("./settings.json", testPath);
+  const defaultSettings = await readFile(
+    new URL("./settings.json", parentDir),
+    { encoding: "utf-8" }
+  );
 
   afterEach(async () => {
     if (existsSync(testPath)) {
@@ -28,13 +32,33 @@ describe("workspace-settings", () => {
     await run({ rootDir: parentDir.toString() });
 
     const createdSettings = await readFile(settingsPath, { encoding: "utf-8" });
-    const defaultSettings = await readFile(
-      new URL("./settings.json", parentDir),
-      { encoding: "utf-8" }
-    );
 
     expect(JSON.parse(createdSettings)).toMatchObject(
       JSON.parse(defaultSettings)
     );
+  });
+
+  test("an existing settings.json file should have missing default values added", async () => {
+    const parsedDefaultSettings = JSON.parse(defaultSettings);
+    const nonDefaultSettings = { "editor.cursorBlinking": "expand" };
+
+    // This check ensures that the test case doesn't become a default setting in the future
+    expect(
+      Object.keys(nonDefaultSettings).every(
+        (k) => !(k in parsedDefaultSettings)
+      )
+    );
+
+    await mkdir(testPath);
+    await writeFile(settingsPath, JSON.stringify(nonDefaultSettings, null, 2));
+
+    await run({ rootDir: parentDir.toString() });
+
+    const createdSettings = await readFile(settingsPath, { encoding: "utf-8" });
+
+    expect(JSON.parse(createdSettings)).toMatchObject({
+      ...parsedDefaultSettings,
+      ...nonDefaultSettings,
+    });
   });
 });

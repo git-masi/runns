@@ -22,5 +22,14 @@ export async function run<
 
   if (!existsSync(settingsPath)) {
     await writeFile(settingsPath, defaultSettings);
+  } else {
+    const parsedDefaultSettings = JSON.parse(defaultSettings);
+    const existingSettings = JSON.parse(
+      await readFile(settingsPath, { encoding: "utf-8" })
+    );
+    await writeFile(
+      settingsPath,
+      JSON.stringify({ ...parsedDefaultSettings, ...existingSettings }, null, 2)
+    );
   }
 }
