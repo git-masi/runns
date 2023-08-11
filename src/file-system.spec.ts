@@ -54,4 +54,14 @@ describe("file system tests", () => {
 
     result.forEach((el) => expect(el).toBeInstanceOf(inquirer.Separator));
   });
+
+  test("given a JSON file it should return an empty array", async () => {
+    const scriptName = "data.json";
+
+    await writeFile(new URL(scriptName, testPath), '{ "test": true }');
+
+    const result = await getChoicesFromDir(fileURLToPath(testPath));
+
+    expect(result.length).toBe(0);
+  });
 });

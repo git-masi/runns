@@ -10,7 +10,11 @@ export async function getChoicesFromDir(path: string) {
     if (dirent.isDirectory()) {
       result.push(new inquirer.Separator(startCase(dirent.name)));
       result.push(...(await getChoicesFromDir(`${dirent.path}${dirent.name}`)));
-    } else if (dirent.isFile()) {
+    } else if (
+      dirent.isFile() &&
+      // Only TS files should be counted as scripts
+      dirent.name.endsWith(".ts")
+    ) {
       result.push(dirent.name);
     }
   }
