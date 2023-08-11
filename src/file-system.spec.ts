@@ -64,4 +64,19 @@ describe("file system tests", () => {
 
     expect(result.length).toBe(0);
   });
+
+  test("given test files it should return an empty array", async () => {
+    const scriptName1 = "data.spec.ts";
+    const scriptName2 = "data.test.ts";
+
+    await Promise.all(
+      [scriptName1, scriptName2].map((name) =>
+        writeFile(new URL(name, testPath), '{ "test": true }')
+      )
+    );
+
+    const result = await getChoicesFromDir(fileURLToPath(testPath));
+
+    expect(result.length).toBe(0);
+  });
 });

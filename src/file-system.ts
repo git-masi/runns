@@ -13,7 +13,7 @@ export async function getChoicesFromDir(path: string) {
     } else if (
       dirent.isFile() &&
       // Only TS files should be counted as scripts
-      dirent.name.endsWith(".ts")
+      /[\w-]+(?<!\.spec|\.test)\.ts/.test(dirent.name)
     ) {
       result.push(dirent.name);
     }
