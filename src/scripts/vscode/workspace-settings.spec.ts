@@ -16,7 +16,11 @@ describe("workspace-settings", () => {
 
   test("it should create a new .vscode directory if not exists", async () => {
     await run({ rootDir: parentDir.toString() });
-
     expect(existsSync(testPath)).toBe(true);
+  });
+
+  test("it should create a new settings.json file if not exists", async () => {
+    await run({ rootDir: parentDir.toString() });
+    expect(existsSync(settingsPath)).toBe(true);
   });
 });
