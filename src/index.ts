@@ -1,9 +1,15 @@
 import inquirer from "inquirer";
-import { cwd } from "node:process";
+import { argv } from "node:process";
 import { run } from "./scripts/vscode/workspace-settings.js";
 
 (async () => {
   try {
+    const prefix = "--targetdir=";
+    const targetDir = (argv.find((a) => a.startsWith(prefix)) ?? "").replace(
+      prefix,
+      ""
+    );
+
     const fns = {
       "workspace-settings": run,
     };
@@ -28,7 +34,7 @@ import { run } from "./scripts/vscode/workspace-settings.js";
       },
     ]);
 
-    const input = { rootDir: cwd() };
+    const input = { rootDir: targetDir };
 
     await Promise.all(selectedChoices.scripts.map((s) => fns[s](input)));
   } catch (error) {
