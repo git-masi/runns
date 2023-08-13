@@ -1,10 +1,12 @@
 import { describe, test, expect, afterEach } from "vitest";
 import { run } from "./workspace-settings.js";
-import { existsSync } from "fs";
-import { mkdir, readFile, rm, writeFile } from "fs/promises";
+import { existsSync } from "node:fs";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 
 describe("workspace-settings", async () => {
   const parentDir = new URL(".", import.meta.url);
+  const rootDir = fileURLToPath(parentDir);
   const testPath = new URL("./.vscode/", parentDir);
   const settingsPath = new URL("./settings.json", testPath);
   const defaultSettings = await readFile(
@@ -19,17 +21,17 @@ describe("workspace-settings", async () => {
   });
 
   test("it should create a new .vscode directory if not exists", async () => {
-    await run({ rootDir: parentDir.toString() });
+    await run({ rootDir });
     expect(existsSync(testPath)).toBe(true);
   });
 
   test("it should create a new settings.json file if not exists", async () => {
-    await run({ rootDir: parentDir.toString() });
+    await run({ rootDir });
     expect(existsSync(settingsPath)).toBe(true);
   });
 
   test("a new settings.json file should have the default values", async () => {
-    await run({ rootDir: parentDir.toString() });
+    await run({ rootDir });
 
     const createdSettings = await readFile(settingsPath, { encoding: "utf-8" });
 
@@ -52,7 +54,7 @@ describe("workspace-settings", async () => {
     await mkdir(testPath);
     await writeFile(settingsPath, JSON.stringify(nonDefaultSettings, null, 2));
 
-    await run({ rootDir: parentDir.toString() });
+    await run({ rootDir });
 
     const createdSettings = await readFile(settingsPath, { encoding: "utf-8" });
 

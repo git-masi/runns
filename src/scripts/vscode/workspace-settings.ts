@@ -1,20 +1,19 @@
-import { existsSync } from "fs";
-import { mkdir, readFile, writeFile } from "fs/promises";
+import { existsSync } from "node:fs";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 
 export async function run<
   T extends {
     rootDir: string;
   }
 >(params: T) {
-  const parentDir = new URL(".", import.meta.url);
-  const dotvscodePath = new URL("./.vscode/", params.rootDir);
-  const settingsPath = new URL("./settings.json", dotvscodePath);
-  const defaultSettings = await readFile(
-    new URL("./settings.json", parentDir),
-    {
-      encoding: "utf-8",
-    }
-  );
+  const parentDir = fileURLToPath(new URL(".", import.meta.url));
+  const dotvscodePath = join(params.rootDir, ".vscode/");
+  const settingsPath = join(dotvscodePath, "settings.json");
+  const defaultSettings = await readFile(join(parentDir, "settings.json"), {
+    encoding: "utf-8",
+  });
 
   if (!existsSync(dotvscodePath)) {
     await mkdir(dotvscodePath);
