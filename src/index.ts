@@ -1,24 +1,37 @@
-import { URL, fileURLToPath } from "node:url";
 import inquirer from "inquirer";
-import { getChoicesFromDir } from "./file-system.js";
+import { cwd } from "node:process";
+import { run } from "./scripts/vscode/workspace-settings.js";
 
-const scriptsDir = fileURLToPath(new URL("./scripts/", import.meta.url));
-const choices = await getChoicesFromDir(scriptsDir);
+(async () => {
+  try {
+    const fns = {
+      "workspace-settings": run,
+    };
 
-const selectedScripts = await inquirer.prompt([
-  {
-    type: "checkbox",
-    message: "Select scripts to run",
-    name: "scripts",
-    choices: choices,
-    validate(answer) {
-      if (answer.length < 1) {
-        return "You must choose at least one script.";
-      }
+    const choices = Object.keys(fns);
 
-      return true;
-    },
-  },
-]);
+    const selectedChoices = await inquirer.prompt<{
+      scripts: Array<keyof typeof fns>;
+    }>([
+      {
+        type: "checkbox",
+        message: "Select scripts to run",
+        name: "scripts",
+        choices,
+        validate(answer) {
+          if (answer.length < 1) {
+            return "You must choose at least one script.";
+          }
 
-console.log(selectedScripts);
+          return true;
+        },
+      },
+    ]);
+
+    const input = { rootDir: cwd() };
+
+    await Promise.all(selectedChoices.scripts.map((s) => fns[s](input)));
+  } catch (error) {
+    console.error(error);
+  }
+})();
