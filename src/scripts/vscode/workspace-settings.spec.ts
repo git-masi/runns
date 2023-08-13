@@ -3,16 +3,16 @@ import { run } from "./workspace-settings.js";
 import { existsSync } from "node:fs";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 
 describe("workspace-settings", async () => {
   const parentDir = new URL(".", import.meta.url);
   const rootDir = fileURLToPath(parentDir);
-  const testPath = new URL("./.vscode/", parentDir);
-  const settingsPath = new URL("./settings.json", testPath);
-  const defaultSettings = await readFile(
-    new URL("./settings.json", parentDir),
-    { encoding: "utf-8" }
-  );
+  const testPath = join(rootDir, ".vscode");
+  const settingsPath = join(testPath, "settings.json");
+  const defaultSettings = await readFile(join(rootDir, "settings.json"), {
+    encoding: "utf-8",
+  });
 
   afterEach(async () => {
     if (existsSync(testPath)) {
